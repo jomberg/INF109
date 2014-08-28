@@ -22,6 +22,7 @@ def sammenlagt():
         minutter = eval(input("Minutter: "))
         sekunder = eval(input("Sekunder og hundrededeler: "))
         poeng = poeng + ( ( (minutter*60) + sekunder) / (distanse / 500 ) )
+        print ("\n\nDEBUG: got data for distance %d meter: min: %d, sek: %.2f\npoeng is now: %.3f\n\n" %(distanse, minutter, sekunder, poeng))
     print ("Sammenlagt poengsum for " + navn + " : " + str(round(poeng,3)) )
 
 # Her på slutten kaller jeg på definisjonen slik at når programmet kjøres
