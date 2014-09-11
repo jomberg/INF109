@@ -37,36 +37,42 @@ def analyse():
     input_file = open(filename, 'r')
     print()
 
-    # Initialize total-counter dictionary
-    TotalCounter = { 'A': 0, 'C': 0, 'G': 0, 'T': 0 }
+    # Define lookup string
+    # used to index into counter list via str.find(sub)
+    LookupString = 'ACGT'
+
+    # Initialize total-counter list
+    TotalCounter = [ 0, 0, 0, 0 ]
     total_length = 0
 
     for line in input_file:
-        # Initialize counter dictionary
-        Counter = { 'A': 0, 'C': 0, 'G': 0, 'T': 0 }
+        # Initialize counter list
+        Counter = [ 0, 0, 0, 0]
         length = len(line)
 
         # Loop over each gen/character in line, counting instances
         for gen in line:
-            Counter[gen] += 1
+            index = LookupString.find(gen)
+            Counter[index] = Counter[index] + 1
+            TotalCounter[index] = TotalCounter[index] + 1
         
         # Keep track of totals
         total_length = total_length + length
-        for gen in TotalCounter:
-            TotalCounter[gen] += Counter[gen]
 
         # Report findings
         print (line)
         print ('Lengde = ', length )
-        for gen in sorted(Counter):
-            print ("Antall {}: {:4d}   prosent: {:4.1f}".format(gen, Counter[gen], (Counter[gen]/length)*100))
+        for gen in LookupString:
+            index = LookupString.find(gen)
+            print ("Antall {}: {:4d}   prosent: {:4.1f}".format(gen, Counter[index], (Counter[index]/length)*100))
         print ()
 
     # Report totals for whole file
     print ('Totalt for hele filen:')
     print ('-' * 40)
-    for gen in sorted(TotalCounter):
-        print ("Antall {}: {:4d}   prosent: {:4.1f}".format(gen, TotalCounter[gen], (TotalCounter[gen]/length)*100))
+    for gen in LookupString:
+        index = LookupString.find(gen)
+        print ("Antall {}: {:4d}   prosent: {:4.1f}".format(gen, TotalCounter[index], (TotalCounter[index]/total_length)*100))
 
 def komplement():
     """
@@ -76,25 +82,35 @@ def komplement():
     ['A', 'C', 'G', 'T'] maps to ['C', 'A', 'T', 'G']
     """
 
-    # Define complement lookup dictionary
-    Complement = {'A': 'C', 'C': 'A', 'G': 'T', 'T': 'G'}
+    # Define lookup string
+    LookupString = 'ACGT'
+
+    # Define complement string
+    ComplementString = 'CATG'
 
     # Read path and name of input file from user
-    filename = (input("Flinavn for komplementering/invers: "))
+    filename = (input("Filnavn for komplementering/invers: "))
 
     input_file = open(filename, 'r')
     print()
 
     for line in input_file:
-        complement_line = ''
+        complement_list = []
+
         # Loop over each gen/character in line, counting instances
         for gen in line:
-            complement_line = complement_line + Complement[gen]
+            position = LookupString.find(gen)
+            complement_list.append(ComplementString[position])
+            #invers_gen = ComplementString[position]
+            #print (gen, ",found at ", position, " => ", invers_gen)
+
+        complement_line = ''.join(complement_list)
+
         # Report findins
         print ('Opprinnelig:')
         print (line)
         print ('Komplementaer:')
-        print (complement_line)
+        print (complement_line, "\n")
 
 # Call methods
 konverter()
