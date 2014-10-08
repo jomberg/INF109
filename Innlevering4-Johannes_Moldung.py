@@ -86,6 +86,7 @@ def main():
 
     #PART 4
     # rapporter funn
+    # http://mkaz.com/2012/10/10/python-string-format/
     print ("\nKoordinater for omraade: (%.3f,%.3f) og (%.3f,%.3f)" %(x1,y1,x2,y2))
     print("EQ-katalog: {}".format(file))
     print("Katalogen dekker perioden %d-%d (%d aar)" %(start_aar,slutt_aar,antall_aar))
