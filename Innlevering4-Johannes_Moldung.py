@@ -4,8 +4,44 @@
 from graphics import*
 from math import*
 
+#PART 1.1
+def ikketom(string):
+    return string.strip() != ''
+
+def godlinje(line):
+    if ikketom(line[23:29]) != False and ikketom(line[30:37]) != False:
+        return True
+
+#PART 1.2
+def styrke(line):
+    if ikketom(line[56:58]):
+        return eval(line[56:58])
+    elif ikketom(line[63:66]):
+        return eval(line[63:66])
+    elif ikketom(line[71:74]):
+        return eval(line[71:74])
+
+#PART 1.3
+def relevant(longtitude, latitude, x1, y1, x2, y2):
+    if x1<=longtitude<=x2 and y1<=latitude<=y2:
+        return True
+    else:
+        return False
+
+#PART 2
+def tegnJordskjelv(window, longtitude, latitude, styrke):
+    #Define window for drawing earthquake
+    earthquake_point = Circle(Point(longtitude,latitude),styrke)
+    window.setCoords(-180,-90,180,90) #To fit the earth's positioning system
+    earthquake_point.setOutline ("purple")
+    earthquake_point.draw(window)
+
+#PART 3
+def Mo(M): #Shall calculate seismic moment rate in newton-meters per year
+    return 10**(1.5 * M + 9.1)
+    
 #MASTER FUNCTION
-def earthquake():
+def main():
     #Get filename from user
     file = input("File name + file type = ?")
     #Get coordinates from user
@@ -17,63 +53,34 @@ def earthquake():
     usr_file = open(file,'r')
     #Window for earthquake
     window = GraphWin("Earthquake File={} x1={} y1={} x2={} y2={}".format(file,x1,y1,x2,y2), 800, 400)
-    #
+
+    antall_skjelv = sum_seismisk_moment = 0
+    start_aar = 9999
+    slutt_aar = 0
     usr_file = open(file,'r')
     for line in usr_file.readlines():
-        if goodline(line) == True and len(line) != 0:
+        if godlinje(line) == True and len(line) != 0:
             latitude = eval(line[23:29])
             longtitude = eval(line[30:37])
             if relevant(longtitude, latitude, x1, y1, x2, y2)== True:
-                usr_file = open(file,'r')
+                magnitude = (styrke(line))
+                tegnJordskjelv(window, longtitude, latitude, magnitude/10)
+                sum_seismisk_moment = sum_seismisk_moment + Mo(magnitude)
+                antall_skjelv += 1
+                if ikketom(line[1:5]) == True:
+                    year = eval(line[1:5])
+                    slutt_aar = max(slutt_aar, year)
+                    start_aar = min(start_aar, year)
+    # slutt, regn ut total seismisk moment: =sum_seismisk_moment/antall_aar
+    seismisk_momentrate = sum_seismisk_moment / (slutt_aar - start_aar)
 
-                magnitude = (strength(line))
-                
-                drawEarthquake(window, longtitude, latitude, magnitude/10)
+    #PART 4
+    # rapporter funn
+    print("Koordinater for omraade: ({},{}) og ({},{})".format(x1,y1,x2,y2) )
+    print("EQ-katalog: {}".format(file))
+    print("Katalogen dekker perioden ", start_aar, "-", slutt_aar)
+    print("Antall jordskjelv: ", antall_skjelv)
+    print("Totalt seismisk moment: ", sum_seismisk_moment, " Nm")
+    print("Seismisk momentrate: ", seismisk_momentrate, " Nm/aar")
 
-    usr_file = open(file, 'r')
-    top = 0
-    bottom = 9999#Reason
-    for line in usr_file:
-        if notempty(line[1:5]) == True:
-            year = eval(line[1:5])
-            if year > top:
-                top = year
-            if year < bottom:
-                bottom = year
-    differance = top - bottom
-
-    
-            
-#PART 1.1
-def notempty(string):
-    return string.strip() != ''
-def goodline(line):
-    if notempty(line[23:29]) != False and notempty(line[30:37]) != False:
-        return True
-#PART 1.2
-def strength(line):
-    if notempty(line[56:58]):
-        return eval(line[56:58])
-    elif notempty(line[63:66]):
-        return eval(line[63:66])
-    elif notempty(line[71:74]):
-        return eval(line[71:74])
-#PART 1.3
-def relevant(longtitude, latitude, x1, y1, x2, y2):
-    if x1<=longtitude<=x2 and y1<=latitude<=y2:
-        return True
-    else:
-        return False
-#PART 2
-def drawEarthquake(window, longtitude, latitude, strength):
-    #Define window for drawing earthquake
-    earthquake_point = Circle(Point(longtitude,latitude),strength)
-    window.setCoords(-180,-90,180,90)#To fit the earth's positioning system
-    earthquake_point.setOutline ("purple")
-    earthquake_point.draw(window)
-#PART 3
-def M0(M):#Shall calculate seismic moment rate in newton-meters per year
-
-#PART 4
-    
-earthquake()
+main()
