@@ -1,97 +1,40 @@
-#Johannes Fåberg Moldung <johannes@moldung.no>
+#Johannes Fåberg Moldung - jmo015
 
 #Importerer grafisk og matematisk hjelpemidler
 from graphics import*
 from math import*
-#DEL 1
-#Beskrivelse av del 1
+from random import*
+
 def G(w,t):
     return  1.2000+t*(1.8000-0.078*(log(w))-0.0946*(log(w))**2 +0.0105*(log(w))**3)
-def vekt(w0,G,d):
-    return w0*(1+G/100)**d
-def relevant():
-    while 4<=t<=14 and 0<=w<=600:
-        return True
+def vekt(w,t,G,d,s):
+    X = gauss(1,s)
+    for n in range(d):
+        X = (X+gauss(1,s))/2
+        xg = G(w,t)
+        ans = w*(1+((xg)/100))
+        return ans
 
-"""def badvekt(w0):
-    return w0 > 600 or w0 < 0
-def badtemp(t):
-    return t < 4 or t > 14
-def vindu(x):
-    vindu = GraphWin("Feilmelding",1000,300)
-    vindu.setCoords(1,1,5,5)
-    tekst = Text(Point(3,3), "")
-    tekst.draw(vindu)
-    tekst.setText(str(x))
-    klikk = vindu.getMouse()
-    vindu.close()
-def G(w0,t):
-    return 1.2000 + t*(1.8000-0.078*log(w0) - 0.0946*(log(w0))**2 + 0.0105*(log(w0))**3)
-def vekt(w0,G,d):
-    return w0*(1+G/100)**d
-def badday(w0,t,d):
-    vekstrate = G(w0,t)
-    vekten = vekt(w0,vekstrate,d)
-    return badvekt(vekten)             
-                
-def maksdag(w0,t,d):
-    vekstrate = G(w0,t)
-    vekten = vekt(w0,vekstrate,d)
-    for i in range(d):
-        vekten = w0*(1+vekstrate/100)**i
-        if badvekt(vekten):
-            return i
-def main():
-    #vindu = GraphWin("Feilmelding",400,400)#flyttet ned hit
-    #vindu.setCoords(0,0,5,5)# denne og
-    #startvekt:
-    d = 1000
-    t = 0
-    w0 = -1
-    while badvekt(w0):
-        w0 = eval(input("skriv inn startvekt i mg: "))
-        if badvekt(w0):
-            vindu("start-vekten må være mindre enn 600mg")
-    while badtemp(t):
-        t = eval(input("skriv inn temperatur i Celcius: "))
-        if badtemp(t):
-            vindu("temp må være mellom 4-14 C")
-    while badday(w0,t,d):
-        d = eval(input("skriv inn antall dager experimentet skal gå over: "))
-        if badday(w0,t,d):
-            vektdag = maksdag(w0,t,d)
-            vindu("maksvekt passert ved dag "+str(vektdag))
-    V = G(w0,t)
-    Ve = vekt(w0,V,d)
-    if not badvekt(w0) and not badtemp(t) and not badvekt(Ve):
-        print("Vekten etter" , d , " dager, er:" , Ve , "mg")"""
-    
-#DEL 2.1
-#Beskrivelse av del 2
+def relevant(t,mw):
+    while 4<=t<=14 and 0<=mw<=600:
+        return True    
+
 def lagGUIvindu():
     #Setter opp grafikkvindu og koordinatsystem
     win = GraphWin("Codmandovindu", 400, 150)
     win.setBackground("white")
     win.setCoords(0,0,100,20)
     #Inputbokser
-    #Rad 1
-    #w0
     w0_txt = Text(Point(4,15),"w0")
     w0_txt.draw(win)
-    #d
     d_txt = Text(Point(29,15),"d:")
     d_txt.draw(win)
-    #t
     t_txt = Text(Point(54,15),"t:")
     t_txt.draw(win)
-    #s
     s_txt = Text(Point(79,15),"s:")
     s_txt.draw(win)
-    #Rad2
-    #mw
     mw_txt = Text(Point(4,11),"mw:")
     mw_txt.draw(win)
-    #N
     N_txt = Text(Point(29,11),"N:")
     N_txt.draw(win)
     #Knapper
@@ -111,76 +54,158 @@ def lagGUIvindu():
     q_rect = Rectangle(Point(60,3),Point(80,7))
     q_rect.draw(win)
     return win
-#DEL 2.2
-def oppvekst():
+
+def grafvindu(d,mw):
     #Sette opp nytt grafikkvindu
-    win = GraphWin("Codmandovindu", 500, 500)
+    win = GraphWin("Codmandovindu-Graf", 500, 500)
     win.setBackground("white")
-    win.setCoords(-30,-30,380,380)
+    win.setCoords(-(d)*0.2,-(mw)*0.2,(d)*1.2,(mw)*1.2)#+- 35 for marg
     #Sette opp synlig koordinatsystem
-    rect = Rectangle(Point(0,0),Point(350,350))
-    rect.setOutline("grey")
+    #Firkant
+    rect = Rectangle(Point(0,0),Point(d,mw))
     rect.draw(win)
-    for i in range[6]:
-        lines = Line(Point(0,0),Point(0,0))
+    #Aksetekst
+    x_axis = Text(Point((d)/2,0-(mw)*0.05),"DAGER")
+    x_axis.draw(win)
+    y_axis = Text(Point(0-(d)*0.09,(mw)/2),"VEKT")
+    y_axis.draw(win)
+
     return win
+
+def graftegn(w0,d,mw,t,s,TV):
+    #Indikatorlinjer
+    for i in range(6):
+        #Setter opp variabler for bruk i tegning av punkter
+        inc_x = 0+(i*(d/5))
+        inc_y = 0+(i*(mw/5))
+        stat_0 = 0
+        stat_x = d
+        stat_y = mw
+        #Tegner punkter
+        #Nedre x-akse
+        low_line = Line(Point(inc_x,(stat_0)-((mw)*0.02)),Point(inc_x,(stat_0)+((mw)*0.02)))
+        low_line.draw(TV)
+        #Øvre x-akse
+        up_line = Line(Point(inc_x,(stat_y)-((mw)*0.02)),Point(inc_x,(stat_y)+((mw)*0.02)))
+        up_line.draw(TV)
+        #Venstre y-akse
+        left_line = Line(Point((stat_0)-((d)*0.02),inc_y),Point((stat_0)+((d)*0.02),inc_y))
+        left_line.draw(TV)
+        #Høyre y-akse
+        right_line = Line(Point((stat_x)-((d)*0.02),inc_y),Point((stat_x)+((d)*0.02),inc_y))
+        right_line.draw(TV)
+        #Tall ved indikatorlinjene
+        x_num1 = Text(Point(inc_x,-stat_y*0.09),"{}".format(int(inc_x)))
+        x_num1.draw(TV)
+        x_num2 = Text(Point(inc_x,stat_y*1.09),"{}".format(int(inc_x)))
+        x_num2.draw(TV)
+        y_num1 = Text(Point(-stat_x*0.09,inc_y),"{}".format(int(inc_y)))
+        y_num1.draw(TV)
+        y_num2 = Text(Point(stat_x*1.09,inc_y),"{}".format(int(inc_y)))
+        y_num2.draw(TV)
+
+def oppvekst(w0,d,mw,t,s,TV):
+    print(t)
+    d=int(d)
+    w=w0
+    w1=Point(0,0)
+    w2=Point(0,0)
+    for k in range(d):
+        if w<mw:
+            w = vekt(w,t,G,d,s)
+            w1 = Point(1+k,w)
+            tlinje = Line(w1,w2)
+            tlinje.setWidth(3)
+            tlinje.setOutline('blue')
+            tlinje.draw(TV)
+            w2 = w1
     
 #MASTER FUNCTION
 def main():
     #Run algorithm!^^
     inputwin = lagGUIvindu()
     #Definerer "Entry"
-    #w0
-    w0= Entry(Point(15,15),7)
-    w0.draw(inputwin)
-    #d
-    d= Entry(Point(40,15),7)
-    d.draw(inputwin)
-    #t
-    t= Entry(Point(65,15),7)
-    t.draw(inputwin)
-    #s
-    s= Entry(Point(90,15),7)
-    s.draw(inputwin)
-    #mw
-    mw= Entry(Point(15,11),7)
-    mw.draw(inputwin)
-    #N
-    N= Entry(Point(40,11),7)
-    N.draw(inputwin)
-    #Setter avslutt til false for å kunne lukke while løkken ved å definere avsluttet til True
-    #OK
+    w0_usr = Entry(Point(15,15),7)
+    w0_usr.draw(inputwin)
+    d_usr = Entry(Point(40,15),7)
+    d_usr.draw(inputwin)
+    t_usr = Entry(Point(65,15),7)
+    t_usr.draw(inputwin)
+    s_usr = Entry(Point(90,15),7)
+    s_usr.draw(inputwin)
+    mw_usr = Entry(Point(15,11),7)
+    mw_usr.draw(inputwin)
+    N_usr = Entry(Point(40,11),7)
+    N_usr.draw(inputwin)
+    #Setter opp tekstfelt i vinduet som sier om vinduet er klar til bruk
     ok = Text(Point(95,2),'OK')
     ok.setOutline('green')
     ok.draw(inputwin)
-    #vent
     vent = Text(Point(95,2),'vent')
     vent.setOutline('red')
-    
+    #Setter opp varible til bruk senere
+    first = 1
+    #Setter avslutt til false for å kunne lukke while løkken ved å definere avsluttet til True
     avslutt = False
     while not avslutt:
         p=inputwin.getMouse()
         p.x = p.getX()
         p.y = p.getY()
-        w0_num = eval(w0.getText())
-        d_num = eval(d.getText())
-        t_num = eval(t.getText())
-        s_num = eval(s.getText())
-        mw_num = eval(mw.getText())
-        N_num = eval(N.getText())
         if (p.x >= 10) and (p.x <= 30) and (p.y >= 3) and (p.y <= 7):
+            #Forteller brukeren at programmet jobber
             ok.undraw()
             vent.draw(inputwin)
-            print('w0:',w0_num,'d:',d_num,'t:',t_num,'s:',s_num,'mw:',mw_num,'N:',N_num)
-            print(True)
-            
+            #Henter ut nyeste brukerinput som tall
+            w0 = float(w0_usr.getText())
+            d = float(d_usr.getText())
+            t = float(t_usr.getText())
+            s = float(s_usr.getText())
+            mw = float(mw_usr.getText())
+            N = float(N_usr.getText())
+            #Sjekker om data fra brukeren er innenfor den amtematiske modellen
+            if relevant(t,mw) == True:
+                #Sjekker om det er det eneste vinduet ved hjelp av varibel definert utenfor løkken
+                if first > 0:
+                    TV = grafvindu(d,mw)
+                graftegn(w0,d,mw,t,s,TV)
+                oppvekst(w0,d,mw,t,s,TV)
+                
+                #Omdefinerer variabelen så løkken ikke lager flere vindu
+                first = 0
+                #Forteller brukeren at programmet er ferdig
+                vent.undraw()
+                ok.draw(inputwin)
+            else:
+                print("ugyldig data!")
+                vent.undraw()
+                ok.draw(inputwin)
+        elif (p.x >= 35) and (p.x <= 55) and (p.y >= 3) and (p.y <= 7):
+            #Forteller brukeren at programmet jobber
+            #Forteller brukeren at programmet jobber
+            ok.undraw()
+            vent.draw(inputwin)
+            #Sjekker om det er det eneste vinduet, og lukker de eventuelle andre vinduene
+            if first == 0:
+                TV.close()
+            #Henter ut nyeste brukerinput som tall
+            w0 = float(w0_usr.getText())
+            d = float(d_usr.getText())
+            t = float(t_usr.getText())
+            s = float(s_usr.getText())
+            mw = float(mw_usr.getText())
+            N = float(N_usr.getText())
+            TV = grafvindu(d,mw)
+            graftegn(w0,d,mw,t,s,TV)
+            oppvekst(w0,d,mw,t,s,TV)
+            #Omdefinerer variabelen så løkken ikke lager flere vindu
+            first = 0
+            #Forteller brukeren at programmet er ferdig
             vent.undraw()
             ok.draw(inputwin)
-        elif (p.x >= 35) and (p.x <= 55) and (p.y >= 3) and (p.y <= 7):
-            print(True)
-            oppvekst(w0,d,mw,t,s,TV)
         elif (p.x >= 60) and (p.x <= 80) and (p.y >= 3) and (p.y <= 7):
+            if first == 0:
+                TV.close()
             inputwin.close()
             avslutt = True
-        else:
-            print(False)
+
+main()
