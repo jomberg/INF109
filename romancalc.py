@@ -48,5 +48,6 @@ roman = "XXIX+V-IV*II/III" # 29+5-4*2/3
 #arabic = AlGoreRythm(roman)
 arabic = do_calc(roman)
 
-print ("\n\n%s = %s = %d" %(roman, arabic[0], arabic[1]))
-print ("eval hele_uttrykket: %d" %(eval(arabic[0])))
+print ("\n\n%s = %s" %(roman, arabic[0]))
+print ("'rpn' %s = %d" %(arabic[0], arabic[1]))
+print ("eval hele_uttrykket: %s = %d" %(arabic[0], eval(arabic[0])))
