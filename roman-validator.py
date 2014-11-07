@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 
 def isValidRoman(S):
-    romans    = [ 'M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I' ]
     operators = [ '+', '-', '*', '/' ]
-    maks_rep  = [   3,    1,   1,    1,   3,    1,   1,    1,   1,    1,   1,    1,  3  ]
+    romans    = [ 'M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I' ]
+    maks_rep  = [   6,    1,   1,    1,   3,    1,   1,    1,   3,    1,   1,    1,  3  ]
     idx_check = []
-
     count_eq = 0
     i = 0
     while i < len(S):
@@ -15,6 +14,8 @@ def isValidRoman(S):
             # Skip check of operators, jump to next char
             #print ("Skip operator ", c)
             i = i + 1
+            idx_check = []
+            count_eq = 0
             continue
 
         # Check for valid 'char'
@@ -69,8 +70,9 @@ def isValidRoman(S):
         prev = idx_check[i]
     return True
 
-romans = [ "II+X", "NEI", "IIII", "III", "VV", "VX", "IM", "XL", "IV", "X+", "MCCXVII", "IIV" ]
-for i in range(len(romans)):
-    roman = romans[i]
-    print ("Testing roman '%s' for validity" %(roman))
-    print (isValidRoman(roman), "\n")
+#test_romans = [ "II+X", "NEI", "IIII", "III", "VV", "VX", "IM", "XL", "IV", "X+", "MCCXVII", "IIV" ]
+test_romans = [ "NEI", "IIII", "III", "VV", "VX", "IM", "XL", "IIV", "IV", "XXIX", "XXIV+V-IV*II/III", "V/II", "CXIII*III+MMI", "MMCCCXL", "MMCCCXLIIII", "MMMMM", "I-X" ]
+for i in range(len(test_romans)):
+    test_roman = test_romans[i]
+    print ("Testing roman '%s' for validity" %(test_roman))
+    print (isValidRoman(test_roman), "\n")
